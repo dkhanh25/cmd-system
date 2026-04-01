@@ -4,6 +4,7 @@
 
 import { useCallback, useState } from 'react';
 
+import { UI_TEXT } from '@/constants/uiText';
 import { module1Api } from '@/services/api';
 import type { ApiErrorResponseDto } from '@/types/api/common';
 import type {
@@ -61,7 +62,7 @@ export function useModule1Calculation(): UseModule1CalculationResult {
         motors: motorCatalogResponse.items,
       });
     } catch {
-      setBootstrapError('The Module 1 reference data could not be loaded.');
+      setBootstrapError(UI_TEXT.states.bootstrapError);
     } finally {
       setIsBootstrapping(false);
     }
@@ -125,10 +126,10 @@ function extractApiErrorResponse(error: unknown): ApiErrorResponseDto | null {
 function getUserFacingSubmissionMessage(apiError: ApiErrorResponseDto | null): string {
   switch (apiError?.error.code) {
     case 'VALIDATION_ERROR':
-      return 'Please correct the highlighted inputs and try again.';
+      return UI_TEXT.states.invalidInputMessage;
     case 'NO_SUITABLE_MOTOR':
-      return 'No suitable motor was found for the current input values.';
+      return UI_TEXT.states.noSuitableMotor;
     default:
-      return 'The calculation could not be completed. Please try again.';
+      return UI_TEXT.states.unableToCalculate;
   }
 }

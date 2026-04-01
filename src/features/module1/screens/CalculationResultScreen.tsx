@@ -1,18 +1,20 @@
-/**
- * Module 1 result screen resolved from the temporary FE-only store by request id.
- */
-
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
-import { AppButton } from '@/components/ui/AppButton';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { InlineError } from '@/components/ui/InlineError';
 import { KeyValueList } from '@/components/ui/KeyValueList';
 import { LoadingState } from '@/components/ui/LoadingState';
-import { SectionCard } from '@/components/ui/SectionCard';
+import { Section } from '@/components/ui/Section';
+import { Text } from '@/components/ui/Text';
+import { routes } from '@/constants/routes';
+import { UI_TEXT } from '@/constants/uiText';
+import { ShaftDetailCard } from '@/features/module1/components/ShaftDetailCard';
 import {
   getCurrentModule1HistoryEntry,
   getModule1HistoryEntryById,
@@ -23,8 +25,7 @@ import {
   formatRatio,
   formatRpm,
   formatTorqueNmm,
-} from '@/features/module1/utils/module1Formatters';
-import { routes } from '@/constants/routes';
+} from '@/features/module1/utils/formatters';
 import { appTheme } from '@/theme';
 import type { Module1CalculationResponseDto } from '@/types/api/module1';
 
@@ -60,9 +61,9 @@ export function CalculationResultScreen() {
     return (
       <ScreenContainer>
         <EmptyState
-          title="No calculation result yet"
-          description="Start a Module 1 calculation first, then this screen will show grouped outputs."
-          actionLabel="Start Calculation"
+          title={UI_TEXT.states.noCalculationResultTitle}
+          description={UI_TEXT.states.noCalculationResultDescription}
+          actionLabel={UI_TEXT.actions.newCalculation}
           onAction={() => router.replace(routes.calculationsNew)}
         />
       </ScreenContainer>
@@ -72,8 +73,11 @@ export function CalculationResultScreen() {
   if (viewState === 'error') {
     return (
       <ScreenContainer>
-        <InlineError message="The result screen could not interpret the current calculation input." />
-        <AppButton label="Start New Calculation" onPress={() => router.replace(routes.calculationsNew)} />
+        <InlineError message={UI_TEXT.states.unableToCalculate} />
+        <Button
+          label={UI_TEXT.actions.newCalculation}
+          onPress={() => router.replace(routes.calculationsNew)}
+        />
       </ScreenContainer>
     );
   }
@@ -82,8 +86,8 @@ export function CalculationResultScreen() {
     return (
       <ScreenContainer>
         <LoadingState
-          title="Loading saved result"
-          description="Resolving the latest Module 1 calculation from the temporary FE-only store."
+          title={UI_TEXT.states.loadingSavedResultsTitle}
+          description={UI_TEXT.states.loadingSavedResultsDescription}
         />
       </ScreenContainer>
     );
@@ -93,103 +97,175 @@ export function CalculationResultScreen() {
 
   return (
     <ScreenContainer>
-      <View style={styles.header}>
-        <Text style={styles.title}>Calculation Result</Text>
-        <Text style={styles.description}>
-          This page is already grouped like a real output screen so the next-step mock API hookup
-          can flow directly into the same layout.
-        </Text>
+      <View style={styles.badges}>
+        <Badge label={UI_TEXT.badge.module1} />
+        <Badge label={result.requestId} />
       </View>
 
-      <SectionCard title="Input Summary">
-        <KeyValueList
-          items={[
-            { label: 'Power on drum shaft', value: formatPowerKw(result.inputEcho.powerKw) },
-            { label: 'Output speed', value: formatRpm(result.inputEcho.outputRpm) },
-            { label: 'Request trace', value: result.requestId },
-          ]}
-        />
-      </SectionCard>
+      <Section
+        title={UI_TEXT.results.title}
+        description={UI_TEXT.results.description}
+      />
 
-      <SectionCard title="Selected Motor">
-        <KeyValueList
-          items={[
-            { label: 'Motor code', value: result.selectedMotor.code },
-            { label: 'Name', value: result.selectedMotor.name },
-            { label: 'Rated power', value: formatPowerKw(result.selectedMotor.ratedPowerKw) },
-            { label: 'Rated speed', value: formatRpm(result.selectedMotor.ratedRpm) },
-            { label: 'Phase', value: result.selectedMotor.phase },
-          ]}
-        />
-      </SectionCard>
-
-      <SectionCard title="System Efficiency">
-        <KeyValueList
-          items={[
-            { label: 'Combined efficiency', value: formatRatio(result.systemEfficiency) },
-          ]}
-        />
-      </SectionCard>
-
-      <SectionCard title="Required Motor Power">
+      <Card
+        title={UI_TEXT.results.inputSummaryTitle}
+        description={UI_TEXT.results.inputSummaryDescription}>
         <KeyValueList
           items={[
             {
-              label: 'Required motor power',
-              value: formatPowerKw(result.requiredMotorPowerKw),
+              label: UI_TEXT.fields.powerLabel,
+              value: formatPowerKw(result.inputEcho.powerKw),
+            },
+            {
+              label: UI_TEXT.fields.outputSpeedLabel,
+              value: formatRpm(result.inputEcho.outputRpm),
+            },
+            {
+              label: UI_TEXT.results.requestId,
+              value: result.requestId,
+              valueVariant: 'bodySmallStrong',
             },
           ]}
         />
-      </SectionCard>
+      </Card>
 
-      <SectionCard title="Transmission Ratios">
+      <Card
+        title={UI_TEXT.results.selectedMotorTitle}
+        description={UI_TEXT.results.selectedMotorDescription}>
         <KeyValueList
           items={[
-            { label: 'Total ratio', value: formatRatio(result.transmissionRatios.total) },
-            { label: 'Belt U1', value: formatRatio(result.transmissionRatios.beltU1) },
-            { label: 'Bevel gear U2', value: formatRatio(result.transmissionRatios.bevelGearU2) },
-            { label: 'Spur gear U3', value: formatRatio(result.transmissionRatios.spurGearU3) },
+            {
+              label: UI_TEXT.results.motorCode,
+              value: result.selectedMotor.code,
+              valueVariant: 'bodySmallStrong',
+            },
+            {
+              label: UI_TEXT.results.motorName,
+              value: result.selectedMotor.name,
+              valueVariant: 'bodySmallStrong',
+            },
+            {
+              label: UI_TEXT.results.ratedPower,
+              value: formatPowerKw(result.selectedMotor.ratedPowerKw),
+            },
+            {
+              label: UI_TEXT.results.ratedSpeed,
+              value: formatRpm(result.selectedMotor.ratedRpm),
+            },
+            {
+              label: UI_TEXT.results.phase,
+              value: result.selectedMotor.phase,
+              valueVariant: 'bodySmallStrong',
+            },
           ]}
         />
-      </SectionCard>
+      </Card>
 
-      <SectionCard title="Shaft Characteristics">
+      <Card
+        title={UI_TEXT.results.systemEfficiencyTitle}
+        description={UI_TEXT.results.systemEfficiencyDescription}>
+        <KeyValueList
+          items={[
+            {
+              label: UI_TEXT.results.systemEfficiencyLabel,
+              value: formatRatio(result.systemEfficiency),
+              valueVariant: 'sectionTitle',
+            },
+          ]}
+        />
+      </Card>
+
+      <Card
+        tone="accent"
+        title={UI_TEXT.results.requiredMotorPowerTitle}
+        description={UI_TEXT.results.requiredMotorPowerDescription}>
+        <KeyValueList
+          items={[
+            {
+              label: UI_TEXT.results.requiredMotorPowerLabel,
+              value: formatPowerKw(result.requiredMotorPowerKw),
+              valueVariant: 'sectionTitle',
+            },
+          ]}
+        />
+      </Card>
+
+      <Card
+        title={UI_TEXT.results.transmissionRatiosTitle}
+        description={UI_TEXT.results.transmissionRatiosDescription}>
+        <KeyValueList
+          items={[
+            {
+              label: UI_TEXT.results.overallRatio,
+              value: formatRatio(result.transmissionRatios.total),
+            },
+            { label: UI_TEXT.results.beltU1, value: formatRatio(result.transmissionRatios.beltU1) },
+            {
+              label: UI_TEXT.results.bevelGearU2,
+              value: formatRatio(result.transmissionRatios.bevelGearU2),
+            },
+            {
+              label: UI_TEXT.results.spurGearU3,
+              value: formatRatio(result.transmissionRatios.spurGearU3),
+            },
+          ]}
+        />
+      </Card>
+
+      <Card
+        title={UI_TEXT.results.shaftCharacteristicsTitle}
+        description={UI_TEXT.results.shaftCharacteristicsDescription}>
         {(
           Object.entries(result.shafts) as Array<
-            [keyof Module1CalculationResponseDto['shafts'], Module1CalculationResponseDto['shafts'][keyof Module1CalculationResponseDto['shafts']]]
+            [
+              keyof Module1CalculationResponseDto['shafts'],
+              Module1CalculationResponseDto['shafts'][keyof Module1CalculationResponseDto['shafts']],
+            ]
           >
         ).map(([shaftKey, shaftValue]) => (
-          <View key={shaftKey} style={styles.shaftBlock}>
-            <Text style={styles.shaftTitle}>{formatShaftLabel(shaftKey)}</Text>
-            <KeyValueList
-              items={[
-                { label: 'Power', value: formatPowerKw(shaftValue.powerKw) },
-                { label: 'Speed', value: formatRpm(shaftValue.rpm) },
-                { label: 'Torque', value: formatTorqueNmm(shaftValue.torqueNmm) },
-                { label: 'Summary', value: shaftValue.summary ?? 'No summary yet' },
-              ]}
-            />
-          </View>
+          <ShaftDetailCard
+            key={shaftKey}
+            title={formatShaftLabel(shaftKey)}
+            power={formatPowerKw(shaftValue.powerKw)}
+            rpm={formatRpm(shaftValue.rpm)}
+            torque={formatTorqueNmm(shaftValue.torqueNmm)}
+            summary={shaftValue.summary ?? UI_TEXT.results.noSummary}
+          />
         ))}
-      </SectionCard>
+      </Card>
 
-      <SectionCard title="Warnings / Notes">
+      <Card
+        title={UI_TEXT.results.notesTitle}
+        description={UI_TEXT.results.notesDescription}>
         {noteItems.length > 0 ? (
           <View style={styles.notesList}>
-            {noteItems.map((item) => (
-              <Text key={item} style={styles.noteItem}>
-                - {item}
-              </Text>
-            ))}
+            {noteItems.map((item) =>
+              item.toLowerCase().includes('warning') || item.toLowerCase().includes('differs') ? (
+                <InlineError key={item} message={item} />
+              ) : (
+                <Text key={item} variant="body" tone="secondary">
+                  - {item}
+                </Text>
+              ),
+            )}
           </View>
         ) : (
-          <Text style={styles.noteFallback}>No warnings were produced for this preview state.</Text>
+          <Text variant="body" tone="secondary">
+            {UI_TEXT.results.noAdditionalNotes}
+          </Text>
         )}
-      </SectionCard>
+      </Card>
 
       <View style={styles.actions}>
-        <AppButton label="Run Another Calculation" onPress={() => router.replace(routes.calculationsNew)} />
-        <AppButton label="View History" onPress={() => router.push(routes.calculationsHistory)} variant="secondary" />
+        <Button
+          label={UI_TEXT.actions.newCalculation}
+          onPress={() => router.replace(routes.calculationsNew)}
+        />
+        <Button
+          label={UI_TEXT.actions.calculationHistory}
+          onPress={() => router.push(routes.calculationsHistory)}
+          variant="secondary"
+        />
       </View>
     </ScreenContainer>
   );
@@ -197,10 +273,7 @@ export function CalculationResultScreen() {
 
 function collectNoteItems(result: Module1CalculationResponseDto): string[] {
   const shaftWarnings = Object.values(result.shafts).flatMap((shaft) => shaft.warnings ?? []);
-  const notes = [
-    'Result data is currently sourced from the in-app mock API layer.',
-    'Temporary FE-only history is used until persistence is added.',
-  ];
+  const notes = [UI_TEXT.results.notes[0], UI_TEXT.results.notes[1]];
 
   return [...notes, ...shaftWarnings];
 }
@@ -214,51 +287,20 @@ function formatShaftLabel(key: keyof Module1CalculationResponseDto['shafts']): s
     case 'shaft3':
       return 'Shaft 3';
     case 'drumShaft':
-      return 'Drum Shaft';
+      return UI_TEXT.results.outputDrumShaft;
     default:
       return 'Motor Shaft';
   }
 }
 
 const styles = StyleSheet.create({
-  header: {
+  badges: {
+    flexDirection: 'row',
     gap: appTheme.spacing.sm,
-  },
-  title: {
-    fontSize: 28,
-    lineHeight: 34,
-    fontWeight: '700',
-    color: appTheme.colors.textPrimary,
-  },
-  description: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: appTheme.colors.textSecondary,
-  },
-  shaftBlock: {
-    gap: appTheme.spacing.xs,
-    padding: appTheme.spacing.sm,
-    borderRadius: appTheme.radii.md,
-    backgroundColor: appTheme.colors.surfaceMuted,
-  },
-  shaftTitle: {
-    fontSize: 15,
-    lineHeight: 20,
-    fontWeight: '700',
-    color: appTheme.colors.textPrimary,
+    flexWrap: 'wrap',
   },
   notesList: {
     gap: appTheme.spacing.xs,
-  },
-  noteItem: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: appTheme.colors.textPrimary,
-  },
-  noteFallback: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: appTheme.colors.textSecondary,
   },
   actions: {
     gap: appTheme.spacing.sm,

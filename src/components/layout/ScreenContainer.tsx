@@ -34,13 +34,14 @@ const styles = StyleSheet.create({
     backgroundColor: appTheme.colors.background,
   },
   content: {
-    padding: appTheme.spacing.lg,
-    paddingBottom: appTheme.spacing.xl,
+    paddingHorizontal: appTheme.spacing.md,
+    paddingTop: appTheme.spacing.md,
+    paddingBottom: appTheme.spacing.xxl,
   },
   inner: {
     width: '100%',
-    maxWidth: 720,
+    maxWidth: 420,
     alignSelf: 'center',
-    gap: appTheme.spacing.md,
+    gap: appTheme.spacing.lg,
   },
 });

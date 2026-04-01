@@ -1,21 +1,29 @@
-/**
- * Simple labeled row for rendering read-only result values and summaries.
- */
-
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { appTheme } from '@/theme';
+import { Text } from './Text';
 
-type ResultRowProps = {
+export type ResultRowProps = {
   label: string;
   value: string;
+  valueVariant?: 'bodyStrong' | 'bodySmallStrong' | 'mono' | 'sectionTitle';
+  valueTone?: 'primary' | 'secondary' | 'muted' | 'accent' | 'error';
 };
 
-export function ResultRow({ label, value }: ResultRowProps) {
+export function ResultRow({
+  label,
+  value,
+  valueVariant = 'mono',
+  valueTone = 'primary',
+}: ResultRowProps) {
   return (
     <View style={styles.row}>
-      <Text style={styles.label}>{label}</Text>
-      <Text style={styles.value}>{value}</Text>
+      <Text variant="bodySmall" tone="secondary" style={styles.label}>
+        {label}
+      </Text>
+      <Text variant={valueVariant} tone={valueTone} style={styles.value}>
+        {value}
+      </Text>
     </View>
   );
 }
@@ -30,16 +38,9 @@ const styles = StyleSheet.create({
   },
   label: {
     flex: 1,
-    fontSize: 14,
-    lineHeight: 20,
-    color: appTheme.colors.textSecondary,
   },
   value: {
     flex: 1,
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '600',
-    color: appTheme.colors.textPrimary,
     textAlign: 'right',
   },
 });

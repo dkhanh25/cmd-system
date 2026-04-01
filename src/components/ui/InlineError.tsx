@@ -1,10 +1,7 @@
-/**
- * Small inline error message block for form and screen-level problems.
- */
-
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { appTheme } from '@/theme';
+import { Text } from './Text';
 
 type InlineErrorProps = {
   message: string;
@@ -13,7 +10,9 @@ type InlineErrorProps = {
 export function InlineError({ message }: InlineErrorProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{message}</Text>
+      <Text variant="caption" tone="error">
+        {message}
+      </Text>
     </View>
   );
 }
@@ -22,14 +21,9 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: appTheme.radii.sm,
     paddingHorizontal: appTheme.spacing.sm,
-    paddingVertical: appTheme.spacing.xs,
-    backgroundColor: appTheme.colors.dangerSoft,
+    paddingVertical: 10,
+    backgroundColor: appTheme.colors.errorSoft,
     borderWidth: 1,
     borderColor: '#F2B8B8',
-  },
-  text: {
-    fontSize: 13,
-    lineHeight: 18,
-    color: appTheme.colors.danger,
   },
 });

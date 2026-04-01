@@ -1,28 +1,28 @@
-/**
- * Module 1 form screen wired to the mock API and temporary FE-only history store.
- */
-
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
-import { AppButton } from '@/components/ui/AppButton';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { InlineError } from '@/components/ui/InlineError';
+import { Input } from '@/components/ui/Input';
 import { KeyValueList } from '@/components/ui/KeyValueList';
 import { LoadingState } from '@/components/ui/LoadingState';
-import { InlineError } from '@/components/ui/InlineError';
-import { LabeledInput } from '@/components/ui/LabeledInput';
-import { SectionCard } from '@/components/ui/SectionCard';
+import { Section } from '@/components/ui/Section';
+import { Text } from '@/components/ui/Text';
+import { routes } from '@/constants/routes';
+import { UI_TEXT } from '@/constants/uiText';
 import { useModule1Calculation } from '@/features/module1/hooks/useModule1Calculation';
 import { addModule1HistoryEntry } from '@/features/module1/state/module1HistoryStore';
-import { formatPowerKw, formatRatio } from '@/features/module1/utils/module1Formatters';
+import { formatRatio } from '@/features/module1/utils/formatters';
 import {
   buildModule1CalculationRequest,
   mapApiFieldErrorsToFormErrors,
   type Module1FormErrors,
   validateModule1Form,
 } from '@/features/module1/utils/module1Validation';
-import { routes } from '@/constants/routes';
 import { appTheme } from '@/theme';
 
 type SubmissionState = 'idle' | 'submitting' | 'error';
@@ -50,7 +50,6 @@ export function NewCalculationScreen() {
 
   async function handleSubmit() {
     const nextErrors = validateModule1Form({ powerKw, outputRpm });
-    setFormErrors({});
     setFormErrors(nextErrors);
 
     if (Object.keys(nextErrors).length > 0) {
@@ -95,118 +94,136 @@ export function NewCalculationScreen() {
 
   return (
     <ScreenContainer>
-      <View style={styles.header}>
-        <Text style={styles.title}>New Module 1 Calculation</Text>
-        <Text style={styles.description}>
-          Enter the two required inputs and run the current mock-backed calculation flow. The same
-          screen structure will stay in place when real backend integration arrives later.
-        </Text>
+      <View style={styles.badges}>
+        <Badge label={UI_TEXT.badge.module1} />
+        <Badge label={UI_TEXT.badge.calculator} />
       </View>
 
-      <SectionCard
-        title="Module Defaults"
-        description="Reference constants and catalog metadata are loaded from the current mock API layer.">
-        {isBootstrapping ? (
-          <LoadingState
-            title="Loading module defaults"
-            description="Fetching constants and catalog information from the mock API."
+      <Section
+        title={UI_TEXT.newCalculation.title}
+        description={UI_TEXT.newCalculation.description}
+      />
+
+      <View style={styles.formArea}>
+        <Card
+          title={UI_TEXT.newCalculation.referenceValuesTitle}
+          description={UI_TEXT.newCalculation.referenceValuesDescription}>
+          {isBootstrapping ? (
+            <LoadingState
+              title={UI_TEXT.newCalculation.bootstrapLoadingTitle}
+              description={UI_TEXT.newCalculation.bootstrapLoadingDescription}
+            />
+          ) : bootstrapError ? (
+            <InlineError message={bootstrapError} />
+          ) : bootstrapData.constants ? (
+            <KeyValueList
+              items={[
+                {
+                  label: UI_TEXT.fields.availableMotors,
+                  value: `${bootstrapData.motors.length}`,
+                  valueVariant: 'bodySmallStrong',
+                },
+                {
+                  label: UI_TEXT.fields.defaultBeltRatio,
+                  value: formatRatio(bootstrapData.constants.defaultBeltRatioUd),
+                },
+                {
+                  label: UI_TEXT.fields.defaultGearRatio,
+                  value: formatRatio(bootstrapData.constants.defaultGearboxRatioUhPreview),
+                },
+                {
+                  label: UI_TEXT.fields.efficiencyD,
+                  value: formatRatio(bootstrapData.constants.etaD),
+                },
+              ]}
+            />
+          ) : null}
+        </Card>
+
+        <Card
+          title={UI_TEXT.newCalculation.requiredInputsTitle}
+          description={UI_TEXT.newCalculation.requiredInputsDescription}>
+          <Input
+            keyboardType="decimal-pad"
+            label={UI_TEXT.fields.powerLabel}
+            value={powerKw}
+            onChangeText={setPowerKw}
+            placeholder={UI_TEXT.fields.powerPlaceholder}
+            unit="kW"
+            helperText={UI_TEXT.fields.powerHelper}
+            errorText={formErrors.powerKw}
           />
-        ) : bootstrapError ? (
-          <InlineError message={bootstrapError} />
-        ) : bootstrapData.constants ? (
-          <KeyValueList
-            items={[
-              { label: 'Available motors', value: `${bootstrapData.motors.length}` },
-              {
-                label: 'Default belt ratio',
-                value: formatRatio(bootstrapData.constants.defaultBeltRatioUd),
-              },
-              {
-                label: 'Gearbox preview ratio',
-                value: formatRatio(bootstrapData.constants.defaultGearboxRatioUhPreview),
-              },
-              {
-                label: 'Default etaD',
-                value: formatRatio(bootstrapData.constants.etaD),
-              },
-            ]}
+
+          <Input
+            keyboardType="decimal-pad"
+            label={UI_TEXT.fields.outputSpeedLabel}
+            value={outputRpm}
+            onChangeText={setOutputRpm}
+            placeholder={UI_TEXT.fields.outputSpeedPlaceholder}
+            unit="rpm"
+            helperText={UI_TEXT.fields.outputSpeedHelper}
+            errorText={formErrors.outputRpm}
           />
+
+          {submissionState === 'error' && submissionError ? (
+            <InlineError message={submissionError} />
+          ) : null}
+        </Card>
+
+        <Card
+          title={UI_TEXT.newCalculation.calculationFlowTitle}
+          description={UI_TEXT.newCalculation.calculationFlowDescription}>
+          <Text variant="body">- {UI_TEXT.newCalculation.calculationFlowBullets[0]}</Text>
+          <Text variant="body">- {UI_TEXT.newCalculation.calculationFlowBullets[1]}</Text>
+          <Text variant="body">- {UI_TEXT.newCalculation.calculationFlowBullets[2]}</Text>
+          <Text variant="body">- {UI_TEXT.newCalculation.calculationFlowBullets[3]}</Text>
+        </Card>
+
+        <View style={styles.actions}>
+          <Button
+            label={UI_TEXT.actions.calculate}
+            onPress={handleSubmit}
+            isLoading={isSubmitting}
+            disabled={isSubmitting}
+          />
+          <Button
+            label={UI_TEXT.actions.clearInputs}
+            onPress={handleReset}
+            variant="secondary"
+          />
+        </View>
+
+        {isSubmitting ? (
+          <View pointerEvents="none" style={styles.overlay}>
+            <LoadingState
+              title={UI_TEXT.newCalculation.loadingTitle}
+              description={UI_TEXT.newCalculation.loadingDescription}
+            />
+          </View>
         ) : null}
-      </SectionCard>
-
-      <SectionCard
-        title="Input Parameters"
-        description="These fields mirror the current public Module 1 calculation request contract.">
-        <LabeledInput
-          keyboardType="decimal-pad"
-          label="Power on drum shaft"
-          value={powerKw}
-          onChangeText={setPowerKw}
-          placeholder="Enter required power"
-          unit="kW"
-          helperText="Required. Must be a numeric value greater than 0."
-          errorText={formErrors.powerKw}
-        />
-
-        <LabeledInput
-          keyboardType="decimal-pad"
-          label="Output rotational speed"
-          value={outputRpm}
-          onChangeText={setOutputRpm}
-          placeholder="Enter required speed"
-          unit="rpm"
-          helperText="Required. Must be a numeric value greater than 0."
-          errorText={formErrors.outputRpm}
-        />
-
-        {submissionState === 'error' && submissionError ? (
-          <InlineError message={submissionError} />
-        ) : null}
-      </SectionCard>
-
-      <SectionCard
-        title="Current Demo Flow"
-        description="This is already wired to the mock API and temporary FE-only history store.">
-        <Text style={styles.noteItem}>- Validate locally before the request runs</Text>
-        <Text style={styles.noteItem}>- Submit to the mock Module 1 calculation API</Text>
-        <Text style={styles.noteItem}>- Save the response in temporary history</Text>
-        <Text style={styles.noteItem}>- Navigate to the result screen by request id</Text>
-      </SectionCard>
-
-      <View style={styles.actions}>
-        <AppButton
-          label="Continue to Result"
-          onPress={handleSubmit}
-          isLoading={isSubmitting}
-          disabled={isSubmitting}
-        />
-        <AppButton label="Reset Fields" onPress={handleReset} variant="secondary" />
       </View>
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
+  badges: {
+    flexDirection: 'row',
     gap: appTheme.spacing.sm,
+    flexWrap: 'wrap',
   },
-  title: {
-    fontSize: 28,
-    lineHeight: 34,
-    fontWeight: '700',
-    color: appTheme.colors.textPrimary,
-  },
-  description: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: appTheme.colors.textSecondary,
-  },
-  noteItem: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: appTheme.colors.textPrimary,
+  formArea: {
+    position: 'relative',
+    gap: appTheme.spacing.lg,
   },
   actions: {
     gap: appTheme.spacing.sm,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    padding: appTheme.spacing.md,
+    backgroundColor: appTheme.colors.overlay,
+    borderRadius: appTheme.radii.xl,
   },
 });

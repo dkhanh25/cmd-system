@@ -2,6 +2,7 @@
  * Form validation helpers for the Module 1 input flow.
  */
 
+import { UI_TEXT } from '@/constants/uiText';
 import type { ApiFieldErrorDto } from '@/types/api/common';
 import type { Module1CalculationRequestDto } from '@/types/api/module1';
 
@@ -21,19 +22,19 @@ export function validateModule1Form(values: Module1FormValues): Module1FormError
   const outputRpm = Number(values.outputRpm);
 
   if (!values.powerKw.trim()) {
-    errors.powerKw = 'Power is required.';
+    errors.powerKw = UI_TEXT.states.invalidInputDescription;
   } else if (Number.isNaN(powerKw)) {
-    errors.powerKw = 'Power must be numeric.';
+    errors.powerKw = UI_TEXT.states.invalidInputDescription;
   } else if (powerKw <= 0) {
-    errors.powerKw = 'Power must be greater than 0.';
+    errors.powerKw = UI_TEXT.states.invalidInputDescription;
   }
 
   if (!values.outputRpm.trim()) {
-    errors.outputRpm = 'Output speed is required.';
+    errors.outputRpm = UI_TEXT.states.invalidInputDescription;
   } else if (Number.isNaN(outputRpm)) {
-    errors.outputRpm = 'Output speed must be numeric.';
+    errors.outputRpm = UI_TEXT.states.invalidInputDescription;
   } else if (outputRpm <= 0) {
-    errors.outputRpm = 'Output speed must be greater than 0.';
+    errors.outputRpm = UI_TEXT.states.invalidInputDescription;
   }
 
   return errors;

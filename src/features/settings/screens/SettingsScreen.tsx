@@ -1,63 +1,90 @@
-/**
- * Placeholder settings screen for future configuration, units, and environment toggles.
- */
-
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
+import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
 import { KeyValueList } from '@/components/ui/KeyValueList';
-import { SectionCard } from '@/components/ui/SectionCard';
+import { Section } from '@/components/ui/Section';
+import { Text } from '@/components/ui/Text';
 import { ACTIVE_MODULE, APP_NAME } from '@/constants/app';
+import { UI_TEXT } from '@/constants/uiText';
 import { appTheme } from '@/theme';
 
 export function SettingsScreen() {
   return (
     <ScreenContainer>
-      <Text style={styles.title}>Settings</Text>
-      <Text style={styles.description}>
-        Keep this screen simple for now. It documents app scope and reserves space for future user
-        preferences without introducing auth or advanced configuration too early.
-      </Text>
+      <View style={styles.badges}>
+        <Badge label={ACTIVE_MODULE} />
+        <Badge label={UI_TEXT.badge.calculator} />
+      </View>
 
-      <SectionCard title="App Information">
+      <Section
+        title={UI_TEXT.settings.title}
+        description={UI_TEXT.settings.description}
+      />
+
+      <Card
+        title={UI_TEXT.settings.appInformationTitle}
+        description={UI_TEXT.settings.appInformationDescription}>
         <KeyValueList
           items={[
-            { label: 'App name', value: APP_NAME },
-            { label: 'Active scope', value: ACTIVE_MODULE },
-            { label: 'Current app mode', value: 'Mock API integration' },
-            { label: 'Current data source', value: 'In-app mock service layer' },
-            { label: 'Contract source', value: 'docs/API_DESIGN_MODULE_1.md' },
+            { label: UI_TEXT.settings.appName, value: APP_NAME, valueVariant: 'bodySmallStrong' },
+            { label: 'Version', value: '1.0.0', valueVariant: 'bodySmallStrong' },
+            { label: UI_TEXT.settings.activeModule, value: ACTIVE_MODULE, valueVariant: 'bodySmallStrong' },
+            {
+              label: UI_TEXT.settings.calculationMode,
+              value: UI_TEXT.settings.calculationModeValue,
+              valueVariant: 'bodySmallStrong',
+            },
+            {
+              label: UI_TEXT.settings.dataSource,
+              value: UI_TEXT.settings.dataSourceValue,
+              valueVariant: 'bodySmallStrong',
+            },
+            {
+              label: UI_TEXT.settings.reference,
+              value: UI_TEXT.settings.referenceValue,
+              valueVariant: 'bodySmallStrong',
+            },
           ]}
         />
-      </SectionCard>
+      </Card>
 
-      <SectionCard title="Future Preferences">
+      <Card
+        title={UI_TEXT.settings.displayPreferencesTitle}
+        description={UI_TEXT.settings.displayPreferencesDescription}>
         <KeyValueList
           items={[
-            { label: 'Units', value: 'Reserved for future selection' },
-            { label: 'Numeric formatting', value: 'Reserved for future rounding preferences' },
-            { label: 'Environment flags', value: 'Reserved for development-only controls' },
+            { label: UI_TEXT.settings.units, value: UI_TEXT.settings.unitsValue, valueVariant: 'bodySmallStrong' },
+            {
+              label: UI_TEXT.settings.numericFormatting,
+              value: UI_TEXT.settings.numericFormattingValue,
+              valueVariant: 'bodySmallStrong',
+            },
+            {
+              label: UI_TEXT.settings.environment,
+              value: UI_TEXT.settings.environmentValue,
+              valueVariant: 'bodySmallStrong',
+            },
           ]}
         />
-      </SectionCard>
+      </Card>
 
-      <SectionCard
-        title="Current Constraints"
-        description="No authentication, remote backend integration, or advanced settings are included at this stage." />
+      <Card
+        title={UI_TEXT.settings.currentScopeTitle}
+        description={UI_TEXT.settings.currentScopeDescription}>
+        <Text variant="body">- {UI_TEXT.settings.currentScopeBullets[0]}</Text>
+        <Text variant="body">- {UI_TEXT.settings.currentScopeBullets[1]}</Text>
+        <Text variant="body">- {UI_TEXT.settings.currentScopeBullets[2]}</Text>
+      </Card>
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 28,
-    lineHeight: 34,
-    fontWeight: '700',
-    color: appTheme.colors.textPrimary,
-  },
-  description: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: appTheme.colors.textSecondary,
+  badges: {
+    flexDirection: 'row',
+    gap: appTheme.spacing.sm,
+    flexWrap: 'wrap',
   },
 });

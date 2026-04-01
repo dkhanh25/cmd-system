@@ -1,93 +1,108 @@
-/**
- * Bootstrap home screen that orients the user and links into the first feature flows.
- */
-
 import { useRouter } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
-import { AppButton } from '@/components/ui/AppButton';
-import { SectionCard } from '@/components/ui/SectionCard';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { KeyValueList } from '@/components/ui/KeyValueList';
+import { Section } from '@/components/ui/Section';
+import { Text } from '@/components/ui/Text';
 import { ACTIVE_MODULE, APP_NAME } from '@/constants/app';
 import { routes } from '@/constants/routes';
+import { UI_TEXT } from '@/constants/uiText';
+import { useModule1HistoryStore } from '@/features/module1/state/module1HistoryStore';
+import { formatDateTime, formatPowerKw, formatRpm } from '@/features/module1/utils/formatters';
 import { appTheme } from '@/theme';
 
 export function HomeScreen() {
   const router = useRouter();
+  const { entries } = useModule1HistoryStore();
+  const latestEntry = entries[0];
 
   return (
     <ScreenContainer>
-      <View style={styles.header}>
-        <Text style={styles.eyebrow}>{ACTIVE_MODULE}</Text>
-        <Text style={styles.title}>{APP_NAME}</Text>
-        <Text style={styles.description}>
-          Start from a clean Module 1 flow: capture engineering inputs, review grouped results, and
-          keep the screen structure ready for mock API integration next.
-        </Text>
+      <View style={styles.badges}>
+        <Badge label={ACTIVE_MODULE} />
+        <Badge label={UI_TEXT.badge.calculator} />
       </View>
 
-      <SectionCard
-        title="Module 1"
-        description="Motor selection and transmission ratio distribution are the only business scope for this stage.">
-        <Text style={styles.listItem}>- Input required shaft power and output speed</Text>
-        <Text style={styles.listItem}>- Review selected motor and transmission ratios</Text>
-        <Text style={styles.listItem}>- Inspect grouped shaft characteristics</Text>
-      </SectionCard>
+      <Section
+        title={APP_NAME}
+        description={UI_TEXT.home.description}
+      />
 
-      <SectionCard
-        title="Get Started"
-        description="The buttons below map directly to the primary navigation destinations we need at this stage.">
+      <Card
+        title={UI_TEXT.home.moduleScopeTitle}
+        description={UI_TEXT.home.moduleScopeDescription}>
+        <Text variant="body">- {UI_TEXT.home.moduleScopeBullets[0]}</Text>
+        <Text variant="body">- {UI_TEXT.home.moduleScopeBullets[1]}</Text>
+        <Text variant="body">- {UI_TEXT.home.moduleScopeBullets[2]}</Text>
+      </Card>
+
+      <Card
+        title={UI_TEXT.home.getStartedTitle}
+        description={UI_TEXT.home.getStartedDescription}>
         <View style={styles.actions}>
-          <AppButton
-            label="Start Module 1 Calculation"
+          <Button
+            label={UI_TEXT.actions.newCalculation}
             onPress={() => router.push(routes.calculationsNew)}
           />
-          <AppButton
-            label="Open Saved Calculations"
+          <Button
+            label={UI_TEXT.actions.calculationHistory}
             onPress={() => router.push(routes.calculationsHistory)}
             variant="secondary"
           />
-          <AppButton
-            label="Open Settings"
+          <Button
+            label={UI_TEXT.actions.settings}
             onPress={() => router.push(routes.settings)}
             variant="secondary"
           />
         </View>
-      </SectionCard>
+      </Card>
 
-      <SectionCard
-        title="Next Integration Step"
-        description="This skeleton intentionally stops before real data wiring. The next task can plug the Module 1 mock API into the same screens without changing the route structure." />
+      {latestEntry ? (
+        <Card
+          title={UI_TEXT.home.recentCalculationTitle}
+          description={UI_TEXT.home.recentCalculationDescription}>
+          <KeyValueList
+            items={[
+              {
+                label: UI_TEXT.results.selectedMotorTitle,
+                value: latestEntry.result.selectedMotor.code,
+                valueVariant: 'bodySmallStrong',
+              },
+              {
+                label: UI_TEXT.fields.powerLabel,
+                value: formatPowerKw(latestEntry.result.inputEcho.powerKw),
+              },
+              {
+                label: UI_TEXT.fields.outputSpeedLabel,
+                value: formatRpm(latestEntry.result.inputEcho.outputRpm),
+              },
+              {
+                label: UI_TEXT.history.saved,
+                value: formatDateTime(latestEntry.createdAt),
+                valueVariant: 'bodySmallStrong',
+              },
+            ]}
+          />
+        </Card>
+      ) : null}
+
+      <Card
+        title={UI_TEXT.home.overviewTitle}
+        description={UI_TEXT.home.overviewDescription}
+      />
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
+  badges: {
+    flexDirection: 'row',
     gap: appTheme.spacing.sm,
-  },
-  eyebrow: {
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    color: appTheme.colors.accent,
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  title: {
-    fontSize: 30,
-    lineHeight: 36,
-    fontWeight: '700',
-    color: appTheme.colors.textPrimary,
-  },
-  description: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: appTheme.colors.textSecondary,
-  },
-  listItem: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: appTheme.colors.textPrimary,
+    flexWrap: 'wrap',
   },
   actions: {
     gap: appTheme.spacing.sm,

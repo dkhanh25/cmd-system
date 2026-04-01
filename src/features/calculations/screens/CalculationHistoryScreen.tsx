@@ -1,18 +1,17 @@
-/**
- * Temporary FE-only history screen backed by a lightweight in-memory Module 1 store.
- */
-
 import { useRouter } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
-import { AppButton } from '@/components/ui/AppButton';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { KeyValueList } from '@/components/ui/KeyValueList';
-import { SectionCard } from '@/components/ui/SectionCard';
-import { useModule1HistoryStore } from '@/features/module1/state/module1HistoryStore';
-import { formatDateTime, formatPowerKw, formatRpm } from '@/features/module1/utils/module1Formatters';
+import { Section } from '@/components/ui/Section';
 import { routes } from '@/constants/routes';
+import { UI_TEXT } from '@/constants/uiText';
+import { useModule1HistoryStore } from '@/features/module1/state/module1HistoryStore';
+import { formatDateTime, formatPowerKw, formatRpm } from '@/features/module1/utils/formatters';
 import { appTheme } from '@/theme';
 
 export function CalculationHistoryScreen() {
@@ -21,29 +20,33 @@ export function CalculationHistoryScreen() {
 
   return (
     <ScreenContainer>
-      <Text style={styles.title}>Saved Calculations</Text>
-      <Text style={styles.description}>
-        Successful Module 1 calculations are currently stored in a lightweight in-memory store so
-        the app is demoable before real persistence is added.
-      </Text>
+      <View style={styles.badges}>
+        <Badge label={UI_TEXT.badge.module1} />
+        <Badge label={UI_TEXT.badge.history} />
+      </View>
+
+      <Section
+        title={UI_TEXT.history.title}
+        description={UI_TEXT.history.description}
+      />
 
       {entries.length === 0 ? (
         <EmptyState
-          title="No saved calculations yet"
-          description="Run a Module 1 calculation first. Successful responses are added here automatically."
-          actionLabel="Start First Calculation"
+          title={UI_TEXT.history.emptyTitle}
+          description={UI_TEXT.history.emptyDescription}
+          actionLabel={UI_TEXT.actions.newCalculation}
           onAction={() => router.push(routes.calculationsNew)}
         />
       ) : (
         <View style={styles.list}>
           {entries.map((entry) => (
-            <SectionCard
+            <Card
               key={entry.id}
               title={entry.title}
               description={entry.summary}
               footer={
-                <AppButton
-                  label="Open Result"
+                <Button
+                  label={UI_TEXT.actions.viewResults}
                   onPress={() =>
                     router.push({
                       pathname: routes.calculationsResult,
@@ -55,34 +58,54 @@ export function CalculationHistoryScreen() {
               }>
               <KeyValueList
                 items={[
-                  { label: 'Saved at', value: formatDateTime(entry.createdAt) },
-                  { label: 'Power', value: formatPowerKw(entry.result.inputEcho.powerKw) },
-                  { label: 'Output speed', value: formatRpm(entry.result.inputEcho.outputRpm) },
                   {
-                    label: 'Selected motor',
-                    value: `${entry.result.selectedMotor.code} / ${formatPowerKw(entry.result.selectedMotor.ratedPowerKw)}`,
+                    label: UI_TEXT.history.saved,
+                    value: formatDateTime(entry.createdAt),
+                    valueVariant: 'bodySmallStrong',
+                  },
+                  { label: UI_TEXT.fields.powerLabel, value: formatPowerKw(entry.result.inputEcho.powerKw) },
+                  {
+                    label: UI_TEXT.fields.outputSpeedLabel,
+                    value: formatRpm(entry.result.inputEcho.outputRpm),
+                  },
+                  {
+                    label: UI_TEXT.results.selectedMotorTitle,
+                    value: entry.result.selectedMotor.code,
+                    valueVariant: 'bodySmallStrong',
                   },
                 ]}
               />
-            </SectionCard>
+            </Card>
           ))}
         </View>
       )}
 
-      <SectionCard
-        title="Saved Item Layout Preview"
-        description="This temporary history shape is intentionally compact so it can be replaced later by persisted or backend-provided summaries.">
+      <Card
+        title={UI_TEXT.history.detailsTitle}
+        description={UI_TEXT.history.detailsDescription}>
         <KeyValueList
           items={[
-            { label: 'Current mode', value: 'In-memory temporary store' },
-            { label: 'Result lookup', value: 'By request id' },
-            { label: 'Persistence', value: 'Planned later' },
+            {
+              label: UI_TEXT.history.savedIn,
+              value: UI_TEXT.history.savedInValue,
+              valueVariant: 'bodySmallStrong',
+            },
+            {
+              label: UI_TEXT.history.reference,
+              value: UI_TEXT.history.referenceValue,
+              valueVariant: 'bodySmallStrong',
+            },
+            {
+              label: UI_TEXT.history.availability,
+              value: UI_TEXT.history.availabilityValue,
+              valueVariant: 'bodySmallStrong',
+            },
           ]}
         />
-      </SectionCard>
+      </Card>
 
-      <AppButton
-        label="Back to Home"
+      <Button
+        label={UI_TEXT.actions.backToHome}
         onPress={() => router.replace(routes.home)}
         variant="secondary"
       />
@@ -91,18 +114,12 @@ export function CalculationHistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 28,
-    lineHeight: 34,
-    fontWeight: '700',
-    color: appTheme.colors.textPrimary,
-  },
-  description: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: appTheme.colors.textSecondary,
+  badges: {
+    flexDirection: 'row',
+    gap: appTheme.spacing.sm,
+    flexWrap: 'wrap',
   },
   list: {
-    gap: appTheme.spacing.md,
+    gap: appTheme.spacing.sm,
   },
 });
