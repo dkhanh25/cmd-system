@@ -1,16 +1,36 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import React from 'react';
-import { useColorScheme } from 'react-native';
+/**
+ * Root Expo Router layout that owns the app-wide stack and screen chrome.
+ */
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+import { appTheme } from '@/theme';
+
+export default function RootLayout() {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <>
+      <StatusBar style="dark" />
+      <Stack
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: appTheme.colors.surface,
+          },
+          headerTintColor: appTheme.colors.textPrimary,
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: '600',
+          },
+          contentStyle: {
+            backgroundColor: appTheme.colors.background,
+          },
+        }}>
+        <Stack.Screen name="index" options={{ title: 'Home' }} />
+        <Stack.Screen name="calculations/new" options={{ title: 'New Calculation' }} />
+        <Stack.Screen name="calculations/result" options={{ title: 'Calculation Result' }} />
+        <Stack.Screen name="calculations/history" options={{ title: 'Saved Calculations' }} />
+        <Stack.Screen name="settings" options={{ title: 'Settings' }} />
+      </Stack>
+    </>
   );
 }

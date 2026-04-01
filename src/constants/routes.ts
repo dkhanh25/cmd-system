@@ -1,0 +1,11 @@
+/**
+ * Central route literals for use outside route files when screens need to link to other flows.
+ */
+
+export const routes = {
+  home: '/' as const,
+  calculationsNew: '/calculations/new' as const,
+  calculationsResult: '/calculations/result' as const,
+  calculationsHistory: '/calculations/history' as const,
+  settings: '/settings' as const,
+};
