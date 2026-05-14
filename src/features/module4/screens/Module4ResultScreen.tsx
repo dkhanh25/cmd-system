@@ -13,21 +13,22 @@ import { Section } from '@/components/ui/Section';
 import { Text } from '@/components/ui/Text';
 import { routes } from '@/constants/routes';
 import { UI_TEXT } from '@/constants/uiText';
-import { module3Api } from '@/services/api';
-import { GeometryDetailCard } from '@/features/module3/components/GeometryDetailCard';
-import { StressCheckCard } from '@/features/module3/components/StressCheckCard';
+import { module4Api } from '@/services/api';
+import { SpurGeometryCard } from '@/features/module4/components/SpurGeometryCard';
+import { SpurStressCheckCard } from '@/features/module4/components/SpurStressCheckCard';
+import { DerivedFactorsCard } from '@/features/module4/components/DerivedFactorsCard';
 import { ShaftForcesCard } from '@/features/module3/components/ShaftForcesCard';
 import { appTheme } from '@/theme';
-import type { Module3CalculationResponseDto } from '@/types/api/module3';
+import type { Module4CalculationResponseDto } from '@/types/api/module4';
 
-export function Module3ResultScreen() {
+export function Module4ResultScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ designCaseId: string }>();
   const designCaseId = Number(params.designCaseId);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [result, setResult] = useState<Module3CalculationResponseDto | null>(null);
+  const [result, setResult] = useState<Module4CalculationResponseDto | null>(null);
 
   useEffect(() => {
     async function loadResult() {
@@ -38,10 +39,10 @@ export function Module3ResultScreen() {
       }
 
       try {
-        const data = await module3Api.getHistory(designCaseId);
+        const data = await module4Api.getHistory(designCaseId);
         setResult(data);
       } catch {
-        setError('Unable to load Module 3 results.');
+        setError('Unable to load Module 4 results.');
       } finally {
         setIsLoading(false);
       }
@@ -76,14 +77,14 @@ export function Module3ResultScreen() {
   return (
     <ScreenContainer>
       <View style={styles.badges}>
-        <Badge label={UI_TEXT.badge.module3} />
+        <Badge label={UI_TEXT.badge.module4} />
         <Badge label={`Result #${result.resultInfo.resultId}`} />
-        <Badge label={result.caseInfo.caseCode} />
+        <Badge label={result.caseInfo.caseCode || `Case #${designCaseId}`} />
       </View>
 
       <Section
-        title={UI_TEXT.module3.resultTitle}
-        description={UI_TEXT.module3.resultDescription}
+        title={UI_TEXT.module4.resultTitle}
+        description={UI_TEXT.module4.resultDescription}
       />
 
       <Card
@@ -92,31 +93,20 @@ export function Module3ResultScreen() {
       >
         <KeyValueList
           items={[
-            { label: UI_TEXT.module3Fields.torqueT1, value: `${result.inputSummary.inputT1Nmm.toFixed(2)} Nmm` },
-            { label: UI_TEXT.module3Fields.speedN1, value: `${result.inputSummary.inputN1Rpm.toFixed(2)} rpm` },
-            { label: UI_TEXT.module3Fields.ratioU2, value: `${result.inputSummary.inputU2.toFixed(2)}` },
-            { label: UI_TEXT.module3Fields.lifeHours, value: `${result.inputSummary.serviceLifeHours} h` },
+            { label: UI_TEXT.module4Fields.torqueT2, value: `${result.inputSummary.inputT2Nmm.toFixed(2)} Nmm` },
+            { label: UI_TEXT.module4Fields.speedN2, value: `${result.inputSummary.inputN2Rpm.toFixed(2)} rpm` },
+            { label: UI_TEXT.module4Fields.ratioU3, value: `${result.inputSummary.inputU3.toFixed(2)}` },
           ]}
         />
       </Card>
 
-      <Card
-        title={UI_TEXT.module3Fields.material}
-        description={result.selectedMaterial.materialName}
-      >
-        <KeyValueList
-          items={[
-            { label: UI_TEXT.module3Fields.heatTreatment, value: result.selectedMaterial.heatTreatment || '-' },
-            { label: UI_TEXT.module3Fields.hardness, value: `${result.selectedMaterial.hbMin} - ${result.selectedMaterial.hbMax}` },
-          ]}
-        />
-      </Card>
+      <SpurGeometryCard geometry={result.spurGearGeometry} />
 
-      <GeometryDetailCard geometry={result.gearGeometry} />
+      <DerivedFactorsCard factors={result.derivedFactors} />
 
-      <StressCheckCard
+      <SpurStressCheckCard
         stress={result.stressCheck}
-        allowable={result.allowableStresses}
+        input={result.inputSummary}
       />
 
       <ShaftForcesCard forces={result.shaftForces} />
@@ -139,15 +129,6 @@ export function Module3ResultScreen() {
           label={UI_TEXT.actions.calculationHistory}
           onPress={() => router.push(routes.calculationsHistory)}
           variant="secondary"
-        />
-        <Button
-          label={UI_TEXT.module4.proceedToSpur}
-          onPress={() => {
-            router.push({
-              pathname: routes.module4New as any,
-              params: { designCaseId: designCaseId.toString() },
-            });
-          }}
         />
       </View>
     </ScreenContainer>

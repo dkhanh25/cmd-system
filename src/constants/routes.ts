@@ -9,5 +9,7 @@ export const routes = {
   calculationsHistory: '/calculations/history' as const,
   module3New: '/module-3/new' as const,
   module3Result: '/module-3/result' as const,
+  module4New: '/module-4/new' as const,
+  module4Result: '/module-4/result' as const,
   settings: '/settings' as const,
 };

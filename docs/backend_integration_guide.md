@@ -1,4 +1,4 @@
-# Backend Integration Guide: Module 1 & Module 3
+# Backend Integration Guide: Module 1, 3 & 4
 
 This guide is for backend engineers who need to replace the current frontend mocks with real HTTP calls to the Spring Boot API.
 
@@ -9,6 +9,7 @@ This guide is for backend engineers who need to replace the current frontend moc
 | **API Client** | [apiClient.ts](/cmd-system/src/services/api/apiClient.ts) | The central HTTP client (Axios/Fetch). Implement this first. |
 | **Module 1 Service** | [module1Api.ts](/cmd-system/src/services/api/module1Api.ts) | Service layer for Motor selection and Transmission design. |
 | **Module 3 Service** | [module3Api.ts](/cmd-system/src/services/api/module3Api.ts) | Service layer for Straight Bevel Gear stage. |
+| **Module 4 Service** | [module4Api.ts](/cmd-system/src/services/api/module4Api.ts) | Service layer for Straight Spur Gear stage. |
 | **Contracts** | `src/services/api/contracts/*.contract.ts` | Centralized endpoint paths and method definitions. |
 | **Data Types** | `src/types/api/*.ts` | Request/Response DTOs matching the backend contract. |
 
@@ -20,7 +21,7 @@ This guide is for backend engineers who need to replace the current frontend moc
 Currently, `src/services/api/apiClient.ts` only throws errors. You should implement it using `axios` or `fetch`. Ensure you handle base URLs (likely from `.env`) and common headers (e.g., `Content-Type: application/json`).
 
 ### Step B: Swap Mocks in API Services
-Go to `src/services/api/module1Api.ts` and `src/services/api/module3Api.ts` and replace the mock calls with `apiClient` calls.
+Go to `src/services/api/module1Api.ts`, `src/services/api/module3Api.ts`, and `src/services/api/module4Api.ts` and replace the mock calls with `apiClient` calls.
 
 **Example for Module 1 Calculation:**
 ```typescript
@@ -91,3 +92,7 @@ To test how the UI reacts to a slow or failing network:
 - `GET /api/v1/module-3/materials`
 - `POST /api/v1/module-3/calculate`
 - `GET /api/v1/module-3/history/{designCaseId}`
+
+### Module 4
+- `POST /api/v1/module-4/calculate`
+- `GET /api/v1/module-4/history/{designCaseId}`

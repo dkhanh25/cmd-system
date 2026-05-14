@@ -24,6 +24,14 @@ export interface ApiErrorResponseDto {
   error: ApiErrorDto;
 }
 
+export interface ShaftForceDto {
+  shaftCode: string;
+  shaftLabel: string;
+  ftN: number;
+  frN: number;
+  faN: number;
+}
+
 export interface ApiRequestOptions {
   headers?: Record<string, string>;
   signal?: AbortSignal;

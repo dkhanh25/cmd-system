@@ -6,6 +6,7 @@ import { useCallback, useState } from 'react';
 
 import { UI_TEXT } from '@/constants/uiText';
 import { module1Api } from '@/services/api';
+import { extractApiErrorResponse } from '@/utils/api';
 import type { ApiErrorResponseDto } from '@/types/api/common';
 import type {
   Module1CalculationRequestDto,
@@ -108,20 +109,6 @@ export function useModule1Calculation(): UseModule1CalculationResult {
   };
 }
 
-function extractApiErrorResponse(error: unknown): ApiErrorResponseDto | null {
-  if (
-    typeof error === 'object' &&
-    error !== null &&
-    'response' in error &&
-    typeof error.response === 'object' &&
-    error.response !== null &&
-    'error' in error.response
-  ) {
-    return error.response as ApiErrorResponseDto;
-  }
-
-  return null;
-}
 
 function getUserFacingSubmissionMessage(apiError: ApiErrorResponseDto | null): string {
   switch (apiError?.error.code) {

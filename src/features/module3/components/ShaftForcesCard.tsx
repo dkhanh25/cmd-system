@@ -5,10 +5,10 @@ import { KeyValueList } from '@/components/ui/KeyValueList';
 import { Text } from '@/components/ui/Text';
 import { UI_TEXT } from '@/constants/uiText';
 import { appTheme } from '@/theme';
-import type { Module3CalculationResponseDto } from '@/types/api/module3';
+import type { ShaftForceDto } from '@/types/api/common';
 
 type Props = {
-  forces: Module3CalculationResponseDto['shaftForces'];
+  forces: ShaftForceDto[];
 };
 
 export function ShaftForcesCard({ forces }: Props) {

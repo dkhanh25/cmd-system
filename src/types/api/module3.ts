@@ -1,4 +1,4 @@
-import type { ApiSuccessListDto } from './common';
+import type { ApiSuccessListDto, ShaftForceDto } from './common';
 
 export interface Module3MaterialDto {
   materialId: number;
@@ -65,12 +65,6 @@ export interface Module3CalculationResponseDto {
     contactStressPass: boolean;
     bendingStressPass: boolean;
   };
-  shaftForces: Array<{
-    shaftCode: string;
-    shaftLabel: string;
-    ftN: number;
-    frN: number;
-    faN: number;
-  }>;
+  shaftForces: ShaftForceDto[];
   calculationNotes: string[];
 }

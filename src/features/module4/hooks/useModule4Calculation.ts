@@ -1,74 +1,43 @@
 /**
- * Lightweight integration hook for Module 3 API calls.
+ * Lightweight integration hook for Module 4 API calls.
  */
 
 import { useCallback, useState } from 'react';
 
 import { UI_TEXT } from '@/constants/uiText';
-import { module3Api } from '@/services/api';
+import { module4Api } from '@/services/api';
 import { extractApiErrorResponse } from '@/utils/api';
 import type { ApiErrorResponseDto } from '@/types/api/common';
 import type {
-  Module3CalculationRequestDto,
-  Module3CalculationResponseDto,
-  Module3MaterialDto,
-} from '@/types/api/module3';
+  Module4CalculationRequestDto,
+  Module4CalculationResponseDto,
+} from '@/types/api/module4';
 
-type BootstrapData = {
-  materials: Module3MaterialDto[];
-};
-
-type UseModule3CalculationResult = {
-  bootstrapData: BootstrapData;
-  bootstrapError: string;
-  isBootstrapping: boolean;
+type UseModule4CalculationResult = {
   isSubmitting: boolean;
   submissionError: string;
   submissionApiError: ApiErrorResponseDto | null;
-  loadBootstrapData: () => Promise<void>;
   submitCalculation: (
-    request: Module3CalculationRequestDto,
+    request: Module4CalculationRequestDto,
   ) => Promise<{
-    result: Module3CalculationResponseDto | null;
+    result: Module4CalculationResponseDto | null;
     apiError: ApiErrorResponseDto | null;
     message: string;
   }>;
 };
 
-export function useModule3Calculation(): UseModule3CalculationResult {
-  const [bootstrapData, setBootstrapData] = useState<BootstrapData>({
-    materials: [],
-  });
-  const [bootstrapError, setBootstrapError] = useState('');
+export function useModule4Calculation(): UseModule4CalculationResult {
   const [submissionError, setSubmissionError] = useState('');
   const [submissionApiError, setSubmissionApiError] = useState<ApiErrorResponseDto | null>(null);
-  const [isBootstrapping, setIsBootstrapping] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const loadBootstrapData = useCallback(async () => {
-    try {
-      setIsBootstrapping(true);
-      setBootstrapError('');
-
-      const materials = await module3Api.getMaterials();
-
-      setBootstrapData({
-        materials,
-      });
-    } catch {
-      setBootstrapError(UI_TEXT.states.bootstrapError);
-    } finally {
-      setIsBootstrapping(false);
-    }
-  }, []);
-
-  const submitCalculation = useCallback(async (request: Module3CalculationRequestDto) => {
+  const submitCalculation = useCallback(async (request: Module4CalculationRequestDto) => {
     try {
       setIsSubmitting(true);
       setSubmissionError('');
       setSubmissionApiError(null);
 
-      const result = await module3Api.calculate(request);
+      const result = await module4Api.calculate(request);
       return {
         result,
         apiError: null,
@@ -91,13 +60,9 @@ export function useModule3Calculation(): UseModule3CalculationResult {
   }, []);
 
   return {
-    bootstrapData,
-    bootstrapError,
-    isBootstrapping,
     isSubmitting,
     submissionError,
     submissionApiError,
-    loadBootstrapData,
     submitCalculation,
   };
 }
