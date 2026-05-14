@@ -266,6 +266,17 @@ export function CalculationResultScreen() {
           onPress={() => router.push(routes.calculationsHistory)}
           variant="secondary"
         />
+        <Button
+          label={UI_TEXT.module3.proceedToBevel}
+          onPress={() => {
+            // Convert string requestId to a number for the mock designCaseId
+            const numericId = parseInt(result.requestId.split('-')[1]) || 1;
+            router.push({
+              pathname: routes.module3New as any,
+              params: { designCaseId: numericId.toString() },
+            });
+          }}
+        />
       </View>
     </ScreenContainer>
   );

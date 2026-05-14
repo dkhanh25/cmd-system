@@ -7,5 +7,7 @@ export const routes = {
   calculationsNew: '/calculations/new' as const,
   calculationsResult: '/calculations/result' as const,
   calculationsHistory: '/calculations/history' as const,
+  module3New: '/module-3/new' as const,
+  module3Result: '/module-3/result' as const,
   settings: '/settings' as const,
 };
